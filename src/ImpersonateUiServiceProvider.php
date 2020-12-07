@@ -2,7 +2,6 @@
 
 namespace Hapidjus\ImpersonateUI;
 
-use App\User;
 use Illuminate\Support\Facades\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;

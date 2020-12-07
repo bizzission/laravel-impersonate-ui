@@ -79,4 +79,6 @@ return [
 	*/
 	'users_exclude' => null,
 
+    'user_class' => null,
+
 ];

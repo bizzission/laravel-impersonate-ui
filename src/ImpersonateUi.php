@@ -5,117 +5,127 @@ namespace Hapidjus\ImpersonateUI;
 use Illuminate\Foundation\Application;
 use App\User;
 
-class ImpersonateUi{
+class ImpersonateUi
+{
 
-	private $app;
-	private $manager;
+    private $app;
+    private $manager;
 
-	public function __construct(Application $app)
-	{
-		$this->app = $app;
-	    $this->manager = $this->app['impersonate'];
-	}
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
+        $this->manager = $this->app['impersonate'];
+    }
 
-	public function userAllowedToImpersonate(){
+    public function userAllowedToImpersonate()
+    {
 
-		if(! auth()->user()){
-			return false;
-		}
+        if (!auth()->user()) {
+            return false;
+        }
 
-		if($this->manager->isImpersonating()){
-			return true;
-		}
+        if ($this->manager->isImpersonating()) {
+            return true;
+        }
 
-		if(! is_array(config('laravel-impersonate-ui.users_allowed_to_impersonate'))){
-			return true;
-		}
+        if (!is_array(config('laravel-impersonate-ui.users_allowed_to_impersonate'))) {
+            return true;
+        }
 
-		return in_array(auth()->user()->email, config('laravel-impersonate-ui.users_allowed_to_impersonate'));
+        return in_array(auth()->user()->email, config('laravel-impersonate-ui.users_allowed_to_impersonate'));
 
-	}
+    }
 
-	public function getImpersonator(){
+    public function getImpersonator()
+    {
 
-	    if($this->manager->getImpersonatorId() !== null)
-	    {
-	        return User::findOrFail($this->manager->getImpersonatorId());
+        if ($this->manager->getImpersonatorId() !== null) {
+            return User::findOrFail($this->manager->getImpersonatorId());
 
-	    }
+        }
 
-	    return null;
+        return null;
 
-	}
+    }
 
-	public function makeTakeRedirectTo(){
+    public function makeTakeRedirectTo()
+    {
 
-		$takeRedirect = $this->getTakeRedirectTo(); 
+        $takeRedirect = $this->getTakeRedirectTo();
 
         if ($this->getTakeRedirectTo() !== 'back') {
-        
+
             return redirect()->to($takeRedirect);
-        
+
         }
-        
+
         return back();
 
-	}
-	public function getTakeRedirectTo(){
+    }
 
-		try {
+    public function getTakeRedirectTo()
+    {
 
-			$uri = route(config('laravel-impersonate-ui.take_redirect_to'));
+        try {
 
-		} catch (\InvalidArgumentException $e) {
+            $uri = route(config('laravel-impersonate-ui.take_redirect_to'));
 
-			$uri = config('laravel-impersonate-ui.take_redirect_to');
+        } catch (\InvalidArgumentException $e) {
 
-		}
+            $uri = config('laravel-impersonate-ui.take_redirect_to');
 
-		return $uri;
+        }
 
-	}
+        return $uri;
 
-	public function makeLeaveRedirectTo(){
+    }
 
-		$leaveRedirect = $this->getLeaveRedirectTo();
+    public function makeLeaveRedirectTo()
+    {
 
-		if ($leaveRedirect !== 'back') {
+        $leaveRedirect = $this->getLeaveRedirectTo();
 
-			return redirect()->to($leaveRedirect);
+        if ($leaveRedirect !== 'back') {
 
-		}
+            return redirect()->to($leaveRedirect);
 
-		return back();
+        }
 
-	}
+        return back();
 
-	public function getLeaveRedirectTo(){
+    }
 
-		try {
+    public function getLeaveRedirectTo()
+    {
 
-			$uri = route(config('laravel-impersonate-ui.leave_redirect_to'));
+        try {
 
-		} catch (\InvalidArgumentException $e) {
+            $uri = route(config('laravel-impersonate-ui.leave_redirect_to'));
 
-			$uri = config('laravel-impersonate-ui.leave_redirect_to');
+        } catch (\InvalidArgumentException $e) {
 
-		}
+            $uri = config('laravel-impersonate-ui.leave_redirect_to');
 
-		return $uri;
-	}
+        }
 
-	static public function getUsers(){
+        return $uri;
+    }
 
-		if(is_array(config('laravel-impersonate-ui.users_only'))){
-			return User::whereIn('id', config('laravel-impersonate-ui.users_only'))->orderBy('name')->get();
-		}
+    static public function getUsers()
+    {
 
-		if(is_array(config('laravel-impersonate-ui.users_exclude'))){
-			return User::whereNotIn('id', config('laravel-impersonate-ui.users_exclude'))->orderBy('name')->get();
-		}
+        $userClass = config('laravel-impersonate-ui.user_class');
 
-		return User::orderBy('name')->get();
+        if (is_array(config('laravel-impersonate-ui.users_only'))) {
+            return $userClass::whereIn('id', config('laravel-impersonate-ui.users_only'))->orderBy('name')->get();
+        }
 
-	}
+        if (is_array(config('laravel-impersonate-ui.users_exclude'))) {
+            return $userClass::whereNotIn('id', config('laravel-impersonate-ui.users_exclude'))->orderBy('name')->get();
+        }
+
+        return $userClass::orderBy('name')->get();
+
+    }
 
 }
